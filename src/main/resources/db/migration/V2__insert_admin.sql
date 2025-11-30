@@ -11,7 +11,7 @@ INSERT INTO users (
 VALUES (
            'admin',
            'admin@scoring.cl',
-           '$2a$12$C8e6GE41rE1gl4t0mK3r3OwQ7yEItUiTJLnYiLMi9F2ySvtJngk2K', -- admin123
+           '$2b$12$LlhWEzpfe9XW/duB48s7nebYu5aFz3c6pudCC57Lzxqx4eWz/aLBm',
            'ADMIN',
            'System',
            'Admin',
