@@ -1,7 +1,7 @@
 package com.madandev.creditscoring.controller;
 
+import com.madandev.creditscoring.domain.dto.DashboardSummaryResponse;
 import com.madandev.creditscoring.domain.dto.ScoreHistoryResponse;
-import com.madandev.creditscoring.domain.dto.ScoreSummaryResponse;
 import com.madandev.creditscoring.domain.entity.ScoreHistory;
 import com.madandev.creditscoring.domain.service.ScoreHistoryService;
 import org.springframework.http.ResponseEntity;
@@ -22,8 +22,7 @@ public class ScoreDashboardController {
     }
 
     /**
-     * Historial de score de un usuario específico.
-     * Ideal para gráfico de línea en el frontend.
+     * Historial para gráfico del frontend
      */
     @GetMapping("/history/{userId}")
     public ResponseEntity<List<ScoreHistoryResponse>> getHistory(@PathVariable Long userId) {
@@ -44,59 +43,44 @@ public class ScoreDashboardController {
     }
 
     /**
-     * Resumen del score de un usuario:
-     * - último score
-     * - nivel de riesgo (calculado aquí)
-     * - fecha de última act.
-     * - promedio
-     * - cantidad de registros
+     * Nuevo resumen para Dashboard del frontend
+     * Aquí devolvemos: totalEvaluations, approvalRate, rejectRate, avgScore
      */
     @GetMapping("/summary/{userId}")
-    public ResponseEntity<ScoreSummaryResponse> getSummary(@PathVariable Long userId) {
+    public ResponseEntity<DashboardSummaryResponse> getDashboardSummary(@PathVariable Long userId) {
 
         List<ScoreHistory> historyList =
                 scoreHistoryService.obtenerHistorialPorUsuario(userId);
 
-        ScoreSummaryResponse summary = new ScoreSummaryResponse();
-        summary.setTotalRecords((long) historyList.size());
+        int totalEvaluations = historyList.size();
+
+        double avgScore = 0;
+        double approvalRate = 0;
+        double rejectRate = 0;
 
         if (!historyList.isEmpty()) {
-            // último por fecha
-            ScoreHistory last = historyList.stream()
-                    .sorted((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()))
-                    .findFirst()
-                    .orElseThrow();
-
-            summary.setLastScore(last.getScoreValue());
-            summary.setLastUpdated(last.getCreatedAt());
-
-            // Nivel de riesgo calculado según el score (misma lógica que el motor)
-            int score = last.getScoreValue();
-            String riskLevel;
-            if (score > 900) {
-                riskLevel = "MUY BAJO";
-            } else if (score > 600) {
-                riskLevel = "BAJO";
-            } else if (score > 300) {
-                riskLevel = "MEDIO";
-            } else {
-                riskLevel = "ALTO";
-            }
-            summary.setRiskLevel(riskLevel);
-
-            // Estadísticas para promedio
+            // PROMEDIO
             DoubleSummaryStatistics stats = historyList.stream()
                     .mapToDouble(ScoreHistory::getScoreValue)
                     .summaryStatistics();
 
-            summary.setAverageScore(stats.getAverage());
+            avgScore = stats.getAverage();
 
-        } else {
-            summary.setLastScore(null);
-            summary.setLastUpdated(null);
-            summary.setRiskLevel("SIN_DATOS");
-            summary.setAverageScore(null);
+            // APROBADOS (score > 600)
+            long approved = historyList.stream()
+                    .filter(x -> x.getScoreValue() > 600)
+                    .count();
+
+            approvalRate = (approved * 100.0) / totalEvaluations;
+            rejectRate = 100 - approvalRate;
         }
+
+        DashboardSummaryResponse summary = new DashboardSummaryResponse(
+                totalEvaluations,
+                approvalRate,
+                rejectRate,
+                avgScore
+        );
 
         return ResponseEntity.ok(summary);
     }

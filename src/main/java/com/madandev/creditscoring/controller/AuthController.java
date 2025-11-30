@@ -26,23 +26,25 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-
-    // AGREGAR ESTO
     private final AuditLogService auditLogService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(
-            @Valid @RequestBody RegisterRequest request
-    ) {
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
 
         if (userRepository.findByUsername(request.getUsername()).isPresent()) {
-            return ResponseEntity.badRequest()
-                    .body(new AuthResponse(null, null, "USERNAME_ALREADY_EXISTS"));
+            return ResponseEntity.badRequest().body(
+                    AuthResponse.builder()
+                            .error("USERNAME_ALREADY_EXISTS")
+                            .build()
+            );
         }
 
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            return ResponseEntity.badRequest()
-                    .body(new AuthResponse(null, null, "EMAIL_ALREADY_EXISTS"));
+            return ResponseEntity.badRequest().body(
+                    AuthResponse.builder()
+                            .error("EMAIL_ALREADY_EXISTS")
+                            .build()
+            );
         }
 
         Role role = Role.USER;
@@ -64,18 +66,22 @@ public class AuthController {
         String token = jwtService.generateToken(user);
 
         return ResponseEntity.ok(
-                new AuthResponse(token, user.getUsername(), user.getRole().name())
+                AuthResponse.builder()
+                        .token(token)
+                        .id(user.getId())
+                        .username(user.getUsername())
+                        .role(user.getRole().name())
+                        .build()
         );
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(
-            @Valid @RequestBody AuthRequest request
-    ) {
-        Authentication authentication;
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody AuthRequest request) {
+
+        Authentication auth;
 
         try {
-            authentication = authenticationManager.authenticate(
+            auth = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             request.getUsername(),
                             request.getPassword()
@@ -83,23 +89,30 @@ public class AuthController {
             );
         } catch (Exception e) {
 
-            // LOG FALLIDO EN LOGIN
             auditLogService.logLogin(
                     userRepository.findByUsername(request.getUsername()).orElse(null),
                     false
             );
 
-            throw e;
+            return ResponseEntity.status(401).body(
+                    AuthResponse.builder()
+                            .error("INVALID_CREDENTIALS")
+                            .build()
+            );
         }
 
-        User user = (User) authentication.getPrincipal();
+        User user = (User) auth.getPrincipal();
         String token = jwtService.generateToken(user);
 
-        // LOG EXITOSO
         auditLogService.logLogin(user, true);
 
         return ResponseEntity.ok(
-                new AuthResponse(token, user.getUsername(), user.getRole().name())
+                AuthResponse.builder()
+                        .token(token)
+                        .id(user.getId())
+                        .username(user.getUsername())
+                        .role(user.getRole().name())
+                        .build()
         );
     }
 }
