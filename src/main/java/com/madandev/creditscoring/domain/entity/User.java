@@ -32,6 +32,10 @@ public class User implements UserDetails {
     @Column(nullable = false, unique = true, length = 255)
     private String email;
 
+    // 👇 NUEVO — campo RUT (único, opcional por ahora)
+    @Column(length = 20, unique = true)
+    private String rut;
+
     @Column(nullable = false)
     private String password;
 
@@ -54,6 +58,10 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<CreditRequest> creditRequests = new ArrayList<>();
 
+    // ==============================
+    // Hooks para timestamps
+    // ==============================
+
     @PrePersist
     protected void onCreate() {
         Instant now = Instant.now();
@@ -66,7 +74,9 @@ public class User implements UserDetails {
         this.updatedAt = Instant.now();
     }
 
-    // ====== Métodos de UserDetails (Spring Security) ======
+    // ==============================
+    // Métodos de Spring Security
+    // ==============================
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -75,21 +85,21 @@ public class User implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return true; // podrías añadir lógica más avanzada después
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true; // podrías añadir flags de bloqueo
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true; // podrías expirar credenciales si quieres
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return true; // podrías tener un campo "enabled"
+        return true;
     }
 }

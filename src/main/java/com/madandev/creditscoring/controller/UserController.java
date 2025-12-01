@@ -1,5 +1,6 @@
 package com.madandev.creditscoring.controller;
 
+import com.madandev.creditscoring.domain.dto.ClientListResponse;
 import com.madandev.creditscoring.domain.entity.User;
 import com.madandev.creditscoring.domain.service.UserService;
 import jakarta.validation.Valid;
@@ -17,21 +18,36 @@ public class UserController {
 
     private final UserService userService;
 
-    // GET /api/users -> lista todos
+    // ============================
+    // LISTAR TODOS LOS USUARIOS
+    // ============================
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<User>> findAll() {
         return ResponseEntity.ok(userService.findAll());
     }
 
-    // GET /api/users/{id} -> detalle
+    // ============================
+    // LISTAR SOLO CLIENTES (DTO)
+    // ============================
+    @GetMapping("/clients")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<ClientListResponse>> findAllClients() {
+        return ResponseEntity.ok(userService.findAllClients());
+    }
+
+    // ============================
+    // DETALLE POR ID
+    // ============================
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<User> findById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.findById(id));
     }
 
-    // POST /api/users -> crear
+    // ============================
+    // CREAR USUARIO
+    // ============================
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<User> create(@Valid @RequestBody User user) {
@@ -39,7 +55,9 @@ public class UserController {
         return ResponseEntity.ok(created);
     }
 
-    // DELETE /api/users/{id} -> eliminar
+    // ============================
+    // ELIMINAR
+    // ============================
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
