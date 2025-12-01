@@ -52,21 +52,33 @@ CREATE TABLE score_history (
 );
 
 -- =============================
--- CREDIT REQUEST
+-- CREDIT REQUEST (COMPLETAMENTE ACTUALIZADO)
 -- =============================
 CREATE TABLE credit_request (
                                 id BIGSERIAL PRIMARY KEY,
                                 user_id BIGINT NOT NULL REFERENCES users(id),
+
                                 amount_requested NUMERIC(15,2) NOT NULL,
+                                approved_amount NUMERIC(15,2),
+
+                                interest_rate_annual NUMERIC(10,2),
+                                term_months INTEGER,
+                                monthly_installment NUMERIC(15,2),
+
+                                risk_level VARCHAR(50),
+                                decision_reason VARCHAR(500),
+
                                 status VARCHAR(50) DEFAULT 'PENDING',
+
                                 request_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
                                 resolution_date TIMESTAMP WITH TIME ZONE,
+
                                 created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
                                 updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 -- =============================
--- AUDIT LOG (100% compatible)
+-- AUDIT LOG
 -- =============================
 CREATE TABLE audit_log (
                            id BIGSERIAL PRIMARY KEY,
