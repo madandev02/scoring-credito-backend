@@ -29,7 +29,9 @@ public class AuthController {
     private final AuditLogService auditLogService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<AuthResponse> register(
+            @Valid @RequestBody RegisterRequest request
+    ) {
 
         if (userRepository.findByUsername(request.getUsername()).isPresent()) {
             return ResponseEntity.badRequest().body(
@@ -47,9 +49,15 @@ public class AuthController {
             );
         }
 
-        Role role = Role.USER;
-        if ("ANALYST".equalsIgnoreCase(request.getRole())) {
+        // Asignación correcta de roles
+        Role role = Role.OPERATOR;
+
+        if ("ADMIN".equalsIgnoreCase(request.getRole())) {
+            role = Role.ADMIN;
+        } else if ("ANALYST".equalsIgnoreCase(request.getRole())) {
             role = Role.ANALYST;
+        } else if ("COMPLIANCE".equalsIgnoreCase(request.getRole())) {
+            role = Role.COMPLIANCE;
         }
 
         User user = User.builder()
@@ -76,7 +84,9 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@Valid @RequestBody AuthRequest request) {
+    public ResponseEntity<AuthResponse> login(
+            @Valid @RequestBody AuthRequest request
+    ) {
 
         Authentication auth;
 

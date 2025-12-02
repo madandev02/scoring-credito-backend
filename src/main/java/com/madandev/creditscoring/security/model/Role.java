@@ -1,7 +1,9 @@
 package com.madandev.creditscoring.security.model;
 
 public enum Role {
-    USER,
+    ADMIN,
     ANALYST,
-    ADMIN
+    OPERATOR,
+    COMPLIANCE,
+    CLIENT
 }
