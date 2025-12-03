@@ -2,7 +2,8 @@ package com.madandev.creditscoring.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import java.time.LocalDateTime;
+
+import java.time.Instant;
 
 @Data
 @Entity
@@ -23,11 +24,11 @@ public class ScoreHistory {
     @Column(name = "change_reason", length = 500)
     private String changeReason;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    @Column(name = "created_at", updatable = false)
+    private Instant createdAt;
 
     @PrePersist
     protected void onCreate() {
-        createdAt = LocalDateTime.now();
+        this.createdAt = Instant.now();
     }
 }

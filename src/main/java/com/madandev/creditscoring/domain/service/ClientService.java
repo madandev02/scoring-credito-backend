@@ -92,7 +92,7 @@ public class ClientService {
     }
 
     // ============================================================
-    // DETALLE CLIENTE
+    // DETALLE DE CLIENTE
     // ============================================================
     public ClientDetailResponse getClientDetail(Long id) {
 
@@ -127,11 +127,13 @@ public class ClientService {
                 .stream()
                 .sorted(Comparator.comparing(ScoreHistory::getCreatedAt).reversed())
                 .map(s -> ScoreHistoryDto.builder()
+                        .id(s.getId())
                         .scoreValue(s.getScoreValue())
                         .changeReason(s.getChangeReason())
                         .createdAt(s.getCreatedAt())
                         .build()
-                ).toList();
+                )
+                .toList();
 
         ScoreHistory latest = scoreHistoryRepository
                 .findTopByUserIdOrderByCreatedAtDesc(id)
@@ -152,10 +154,10 @@ public class ClientService {
                         .id(cr.getId())
                         .amountRequested(cr.getAmountRequested())
                         .status(cr.getStatus())
-                        .createdAt(cr.getCreatedAt() == null ? null :
-                                cr.getCreatedAt().atZone(java.time.ZoneId.systemDefault()).toLocalDateTime())
+                        .createdAt(cr.getCreatedAt())
                         .build()
-                ).toList();
+                )
+                .toList();
 
         return ClientDetailResponse.builder()
                 .id(client.getId())

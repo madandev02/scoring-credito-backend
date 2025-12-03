@@ -2,6 +2,7 @@ package com.madandev.creditscoring.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.Instant;
 
 @Entity
@@ -54,13 +55,15 @@ public class CreditRequest {
     @Column(name = "status", length = 50)
     private String status;
 
+    // Fecha en que se realizó la solicitud
     @Column(name = "request_date", nullable = false)
     private Instant requestDate;
 
+    // Fecha en que se tomó la decisión (aprobado/rechazado)
     @Column(name = "resolution_date")
     private Instant resolutionDate;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", updatable = false)
     private Instant createdAt;
 
     @Column(name = "updated_at")
@@ -69,12 +72,12 @@ public class CreditRequest {
     @PrePersist
     protected void onCreate() {
         Instant now = Instant.now();
-        createdAt = now;
-        requestDate = now;
+        this.createdAt = now;
+        this.requestDate = now;
     }
 
     @PreUpdate
     protected void onUpdate() {
-        updatedAt = Instant.now();
+        this.updatedAt = Instant.now();
     }
 }

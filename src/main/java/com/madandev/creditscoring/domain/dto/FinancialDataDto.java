@@ -3,7 +3,7 @@ package com.madandev.creditscoring.domain.dto;
 import lombok.Builder;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Builder
 public record FinancialDataDto(
@@ -19,5 +19,5 @@ public record FinancialDataDto(
         Boolean dicom,
         String activos,
         String region,
-        LocalDateTime createdAt
+        Instant createdAt
 ) {}

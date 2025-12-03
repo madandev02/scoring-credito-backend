@@ -1,14 +1,16 @@
 package com.madandev.creditscoring.domain.dto;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import java.time.Instant;
 
-import java.time.LocalDateTime;
-
-@Data
+@Getter
+@Setter
 public class ScoreHistoryResponse {
 
     private Long id;
     private Integer scoreValue;
     private String changeReason;
-    private LocalDateTime createdAt;
+    private Instant createdAt;
+
 }

@@ -19,29 +19,23 @@ public class ClientController {
 
     private final ClientService clientService;
 
-    // ==================================
-    // GET: LISTAR CLIENTES
-    // ==================================
+    // LISTA DE CLIENTES
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN','ANALYST','OPERATOR','AUDITOR','SUPPORT')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_ANALYST','ROLE_OPERATOR','ROLE_AUDITOR','ROLE_SUPPORT')")
     public ResponseEntity<List<ClientListResponse>> listClients() {
         return ResponseEntity.ok(clientService.listClients());
     }
 
-    // ==================================
-    // GET: DETALLE CLIENTE
-    // ==================================
+    // DETALLE CLIENTE
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN','ANALYST','OPERATOR','AUDITOR','SUPPORT')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_ANALYST','ROLE_OPERATOR','ROLE_AUDITOR','ROLE_SUPPORT')")
     public ResponseEntity<ClientDetailResponse> getClient(@PathVariable Long id) {
         return ResponseEntity.ok(clientService.getClientDetail(id));
     }
 
-    // ==================================
-    // POST: CREAR CLIENTE
-    // ==================================
+    // CREAR CLIENTE
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN','ANALYST')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_ANALYST')")
     public ResponseEntity<ClientDetailResponse> createClient(
             @Valid @RequestBody ClientCreateRequest request
     ) {

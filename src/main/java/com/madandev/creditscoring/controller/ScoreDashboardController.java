@@ -21,9 +21,6 @@ public class ScoreDashboardController {
         this.scoreHistoryService = scoreHistoryService;
     }
 
-    /**
-     * Historial para gráfico del frontend
-     */
     @GetMapping("/history/{userId}")
     public ResponseEntity<List<ScoreHistoryResponse>> getHistory(@PathVariable Long userId) {
 
@@ -35,17 +32,13 @@ public class ScoreDashboardController {
             dto.setId(h.getId());
             dto.setScoreValue(h.getScoreValue());
             dto.setChangeReason(h.getChangeReason());
-            dto.setCreatedAt(h.getCreatedAt());
+            dto.setCreatedAt(h.getCreatedAt()); // Instant → Instant ✔
             return dto;
         }).collect(Collectors.toList());
 
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * Nuevo resumen para Dashboard del frontend
-     * Aquí devolvemos: totalEvaluations, approvalRate, rejectRate, avgScore
-     */
     @GetMapping("/summary/{userId}")
     public ResponseEntity<DashboardSummaryResponse> getDashboardSummary(@PathVariable Long userId) {
 
@@ -59,14 +52,12 @@ public class ScoreDashboardController {
         double rejectRate = 0;
 
         if (!historyList.isEmpty()) {
-            // PROMEDIO
             DoubleSummaryStatistics stats = historyList.stream()
                     .mapToDouble(ScoreHistory::getScoreValue)
                     .summaryStatistics();
 
             avgScore = stats.getAverage();
 
-            // APROBADOS (score > 600)
             long approved = historyList.stream()
                     .filter(x -> x.getScoreValue() > 600)
                     .count();
